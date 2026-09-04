@@ -167,6 +167,7 @@ All colors MUST be HSL.
   }
 
   .glass-effect {
+    -webkit-backdrop-filter: blur(24px);
     backdrop-filter: blur(24px);
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.2);
