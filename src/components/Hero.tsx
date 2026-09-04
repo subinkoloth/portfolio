@@ -82,14 +82,14 @@ const Hero = () => {
           >
             {/* Outer morphing ring */}
             <motion.div
-              animate={{ rotate: 360, borderRadius: ["42% 58% 70% 30% / 45% 45% 55% 55%", "70% 30% 52% 48% / 60% 40% 60% 40%", "42% 58% 70% 30% / 45% 45% 55% 55%"] }}
+              animate={{ rotate: 360, borderRadius: ["40% 60% 70% 30%", "70% 30% 50% 50%", "40% 60% 70% 30%"] }}
               transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
               className="absolute inset-0 border border-primary/40 shadow-glow/15 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"
             />
 
             {/* Middle complex glassmorphic torus */}
             <motion.div
-              animate={{ rotate: -360, borderRadius: ["50% 50% 30% 70% / 50% 60% 40% 50%", "30% 70% 70% 30% / 50% 30% 70% 50%", "50% 50% 30% 70% / 50% 60% 40% 50%"] }}
+              animate={{ rotate: -360, borderRadius: ["50% 50% 30% 70%", "30% 70% 70% 30%", "50% 50% 30% 70%"] }}
               transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
               className="absolute w-[80%] h-[80%] border-2 border-secondary/30 bg-black/40 backdrop-blur-md shadow-elegant"
             />

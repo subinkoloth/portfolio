@@ -14,10 +14,15 @@ const CustomCursor = () => {
   const trailX = useSpring(mouseX, trailConfig);
   const trailY = useSpring(mouseY, trailConfig);
 
+  const [isTouch, setIsTouch] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [magneticElement, setMagneticElement] = useState<DOMRect | null>(null);
 
   useEffect(() => {
+    const touchCheck = typeof window !== "undefined" && (window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window);
+    setIsTouch(touchCheck);
+    if (touchCheck) return;
+
     const updateMousePosition = (e: MouseEvent) => {
       if (magneticElement) {
         return;
@@ -28,7 +33,7 @@ const CustomCursor = () => {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const hoverable = 
+      const hoverable =
         target.tagName.toLowerCase() === "button" ||
         target.tagName.toLowerCase() === "a" ||
         target.closest("button") ||
@@ -39,7 +44,7 @@ const CustomCursor = () => {
       if (hoverable) {
         setIsHovering(true);
         const triggerEl = target.closest(".hover-trigger") || target.closest("button") || target.closest("a") || target;
-        
+
         if (triggerEl.classList.contains("hover-trigger") || triggerEl.tagName.toLowerCase() === "button" || triggerEl.tagName.toLowerCase() === "a") {
           const rect = triggerEl.getBoundingClientRect();
           setMagneticElement(rect);
@@ -78,6 +83,8 @@ const CustomCursor = () => {
     };
   }, [magneticElement]);
 
+  if (isTouch) return null;
+
   return (
     <>
       {/* Outer lagging ring */}
@@ -90,8 +97,8 @@ const CustomCursor = () => {
           translateY: "-50%",
           width: isHovering ? 80 : 40,
           height: isHovering ? 80 : 40,
-          background: isHovering 
-            ? "radial-gradient(circle, rgba(0,255,255,0.1) 0%, rgba(143,0,255,0.15) 100%)" 
+          background: isHovering
+            ? "radial-gradient(circle, rgba(0,255,255,0.1) 0%, rgba(143,0,255,0.15) 100%)"
             : "transparent",
           boxShadow: isHovering ? "0 0 20px rgba(0, 255, 255, 0.3)" : "none",
           border: isHovering ? "2px solid rgba(0, 255, 255, 0.8)" : "1.5px solid rgba(255, 255, 255, 0.4)",

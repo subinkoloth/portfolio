@@ -30,32 +30,37 @@ const Index = () => {
   const scale = useTransform(scrollVelocity, (v) => 1 - Math.min(0.02, Math.abs(v) * 0.0005));
 
   useEffect(() => {
-    const isTouch = window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
+    const isTouch = typeof window !== "undefined" && (window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window);
     setIsTouchDevice(isTouch);
 
-    // Initialize Lenis for smooth scrolling on desktop mouse wheel
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: !isTouch,
-      syncTouch: false, // Do not hijack touch scrolling on mobile
-    });
-
+    let lenis: Lenis | null = null;
     let animationFrameId: number;
 
-    function raf(time: number) {
-      lenis.raf(time);
-      animationFrameId = requestAnimationFrame(raf);
-    }
-    animationFrameId = requestAnimationFrame(raf);
-
-    // Track scroll velocity for warp transitions (desktop only)
+    // Only instantiate Lenis on desktop non-touch devices
     if (!isTouch) {
-      lenis.on("scroll", (e: { velocity: number }) => {
-        scrollVelocity.set(e.velocity);
-      });
+      try {
+        lenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          orientation: "vertical",
+          gestureOrientation: "vertical",
+          smoothWheel: true,
+        });
+
+        const raf = (time: number) => {
+          if (lenis) {
+            lenis.raf(time);
+            animationFrameId = requestAnimationFrame(raf);
+          }
+        };
+        animationFrameId = requestAnimationFrame(raf);
+
+        lenis.on("scroll", (e: { velocity: number }) => {
+          scrollVelocity.set(e.velocity);
+        });
+      } catch (e) {
+        console.warn("Lenis initialization skipped:", e);
+      }
     }
 
     // Mouse tracking for background gradients
@@ -72,8 +77,12 @@ const Index = () => {
       if (!isTouch) {
         window.removeEventListener("mousemove", handleMouseMove);
       }
-      cancelAnimationFrame(animationFrameId);
-      lenis.destroy();
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (lenis) {
+        lenis.destroy();
+      }
     };
   }, []);
 
